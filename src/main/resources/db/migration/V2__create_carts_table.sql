@@ -1,30 +1,18 @@
 -- carts table
-CREATE TABLE carts (
+CREATE TABLE IF NOT EXISTS carts (
   id BINARY(16) NOT NULL,
-  date_created DATE NOT NULL DEFAULT CURRENT_DATE,
+  date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
 -- carts_item table
-CREATE TABLE carts_item (
+CREATE TABLE IF NOT EXISTS carts_item (
   id BIGINT NOT NULL AUTO_INCREMENT,
   cart_id BINARY(16) NOT NULL,
   product_id BIGINT NOT NULL,
   quantity INT NOT NULL DEFAULT 1,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY cart_product_unique (cart_id, product_id),
+  CONSTRAINT cart_items_carts_fk FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
+  CONSTRAINT cart_items_products_fk FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
-
--- foreign key to carts
-ALTER TABLE carts_item
-ADD CONSTRAINT cart_items_carts__fk
-FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE;
-
--- foreign key to products
-ALTER TABLE carts_item
-ADD CONSTRAINT cart_items_products__fk
-FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE;
-
--- unique constraint
-ALTER TABLE carts_item
-ADD CONSTRAINT cart_items_cart_product_unique
-UNIQUE (cart_id, product_id);
